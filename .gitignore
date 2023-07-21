@@ -1,0 +1,7 @@
+﻿TestResults/
+Hooks/
+extent-config.xml
+bin/
+obj/
+.vscode
+.idea

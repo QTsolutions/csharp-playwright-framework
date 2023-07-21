@@ -1,0 +1,12 @@
+﻿{
+  "url": "https://bookcart.azurewebsites.net",
+  "testToBeSearched": "",
+  "validUserName": "ortoni11",
+  "validPassword": "Pass1234",
+  "invalidUserName": "saifi",
+  "invalidPassword": "Pass0000",
+  "postApiEndPoint": "/api/Login",
+  "addToCartApiEndPoint": "/api/ShoppingCart/AddToCart/16634/2",
+  "shoppingCartApiEndPoint": "/api/ShoppingCart/SetShoppingCart/2/4",
+  "getAllBookApiEndPoint": "/api/Book"
+}
