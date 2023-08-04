@@ -1,6 +1,6 @@
 
 ```
-This is the basic project of C#,Sekenium and NUnit. I have tried to build a framework based on Page Object Model
+This is the basic project of C#,Selenium and NUnit. I have tried to build a framework based on Page Object Model
 ```
 ## Technology Used
 ```

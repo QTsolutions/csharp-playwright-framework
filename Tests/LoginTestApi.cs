@@ -1,8 +1,5 @@
-﻿using OpenQA.Selenium;
-using POM_Basic.Source.Drivers;
-using POM_Basic.Source.Pages;
+﻿using POM_Basic.Source.Drivers;
 using Microsoft.Playwright;
-using NUnit;
 using FluentAssertions;
 using System.Text.Json;
 using POM_Basic.Utilities;
@@ -12,42 +9,29 @@ namespace POM_Basic.Tests
 
     public class LoginTestApi : Driver
     {
-         ReadJson json = new ReadJson();
-       
+        ReadJson json = new ReadJson();
+
         [Test]
-        [Fact]
-        public async Task GetRequest()
+        [TestCase("getAllBookApiEndPoint")]
+        public async Task GetRequest(string endPoint)
         {
-            var playwright = await Playwright.CreateAsync();
-            var requestContext = await playwright.APIRequest.NewContextAsync(new APIRequestNewContextOptions
-            {
-                 BaseURL = json.ReadData("url")
-            });
-            var response = await requestContext.GetAsync(json.ReadData("getAllBookApiEndPoint"));
+            await loginpage.CreateApiContext();
+
+            var response = await loginpage.ApiRequestContext?.GetAsync(endPoint)!;
             var jsonElement = await response.JsonAsync();
             Console.WriteLine(jsonElement);
         }
 
         [Test]
-        [Fact]
-        public async Task AuthenticateTest()
+        [TestCase("postApiEndPoint", "payload")]
+        public async Task AuthenticateTest(string endPoint, object payload)
         {
-            var playwright = await Playwright.CreateAsync();
-            var requestContext = await playwright.APIRequest.NewContextAsync(new APIRequestNewContextOptions
-            {
-                BaseURL = json.ReadData("url"),
-                IgnoreHTTPSErrors = true
-            });
-            Console.WriteLine(requestContext);
+            await loginpage.CreateApiContext();
 
-            var response = await requestContext.PostAsync(json.ReadData("postApiEndPoint"), new APIRequestContextOptions
+            var response = await loginpage.ApiRequestContext?.PostAsync(endPoint, new APIRequestContextOptions
             {
-                DataObject = new
-                {
-                    username = json.ReadData("validUserName"),
-                    password = json.ReadData("validPassword")
-                }
-            });
+                DataObject = payload
+            })!;
 
             var jsonString = await response.JsonAsync();
             Console.WriteLine(jsonString);
@@ -57,77 +41,58 @@ namespace POM_Basic.Tests
         }
 
         [Test]
-        [Fact]
-        public async Task AddToCart()
+        [TestCase("addToCartApiEndPoint")]
+        public async Task AddToCart(string endPoint)
         {
-            var playwright = await Playwright.CreateAsync();
-            var requestContext = await playwright.APIRequest.NewContextAsync(new APIRequestNewContextOptions
-            {
-                BaseURL = json.ReadData("url"),
-                IgnoreHTTPSErrors = true
-            });
-            Console.WriteLine(requestContext);
+            await loginpage.CreateApiContext();
 
-            var response = await requestContext.PostAsync(json.ReadData("addToCartApiEndPoint"));
+            var response = await loginpage.ApiRequestContext?.PostAsync(endPoint)!;
 
             var jsonString = await response.JsonAsync();
             Console.WriteLine(jsonString);
-        }
 
-        [Fact]
-        private async Task<string?> GetToken()
-        {
-            var playwright = await Playwright.CreateAsync();
-            var requestContext = await playwright.APIRequest.NewContextAsync(new APIRequestNewContextOptions
-            {
-                BaseURL = json.ReadData("url"),
-                IgnoreHTTPSErrors = true
-            });
+            string quantityValueOld = json.ReadQuantityJson("Quantity");
+            int quantityValueInt = int.Parse(quantityValueOld);
 
-            var response = await requestContext.PostAsync(json.ReadData("postApiEndPoint"), new APIRequestContextOptions
-            {
-                DataObject = new
-                {
-                    username = json.ReadData("validUserName"),
-                    password = json.ReadData("validPassword")
-                }
-            })!;
+            int quantityValueNew = int.Parse(jsonString.ToString()!);
+            Console.WriteLine("Quantity Value (New Method): " + quantityValueNew);
 
-            var jsonString = await response.JsonAsync();
-
-            return jsonString?.Deserialize<Authenticate>()?.token;
+            Assert.AreEqual(quantityValueInt + 1, quantityValueNew);
         }
 
         [Test]
-        [Fact]
-        public async Task GetShoppingCart()
+        [TestCase("shoppingCartApiEndPoint")]
+        public async Task GetShoppingCart(string endPoint)
         {
-            var token = await GetToken();
+             await loginpage.CreateApiContext();
 
-            var playwright = await Playwright.CreateAsync();
-            var requestContext = await playwright.APIRequest.NewContextAsync(new APIRequestNewContextOptions
+            var response = await loginpage.ApiRequestContext?.GetAsync(endPoint)!;
+            var jsonElement = await response.JsonAsync();
+            Console.WriteLine(jsonElement);
+
+            byte[] responseBody = await response.BodyAsync();
+
+            // Parse the JSON byte array to a JsonDocument.
+            using var document = JsonDocument.Parse(responseBody);
+            
+            int quantityValue;
+            
+            //convert the jsonElement into string
+            if(jsonElement.ToString()!.Equals("[]"))
             {
-                BaseURL = json.ReadData("url"),
-                IgnoreHTTPSErrors = true
-            });
-
-            var response = await requestContext.GetAsync(json.ReadData("shoppingCartApiEndPoint"), new APIRequestContextOptions
-            {
-                Headers = new Dictionary<string, string>
-                 {
-                    {"Authorization", $"Bearer {token}"}
-                 }
-            })!;
-
-            var data = await response.JsonAsync();
-            Console.WriteLine(data);
+                quantityValue = 0;
+            }else{
+                // Access the first item in the JSON array (if it's an array).
+                quantityValue = document.RootElement.EnumerateArray().FirstOrDefault().GetProperty("quantity").GetInt32();
+            
+            }
+            //write the value in the json file
+            JsonUtility.SerializeAndWrite(quantityValue.ToString());
         }
 
-
+        //record is an immutable data type with read-only properties 
         private record Authenticate(string token) { }
 
-        internal class FactAttribute : Attribute
-        { }
     }
 }
 

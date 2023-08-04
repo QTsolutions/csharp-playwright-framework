@@ -1,12 +1,12 @@
-﻿using OpenQA.Selenium;
-using POM_Basic.Source.Drivers;
-using POM_Basic.Source.Pages;
+﻿using POM_Basic.Source.Drivers;
 using POM_Basic.Utilities;
 
 namespace POM_Basic.Tests
 {
     public class LoginTest : Driver
-    {  
+    {
+        ReadJson json = new ReadJson();
+
         [Test]
         public async Task Login_Should_Not_Be_Success()
         {
@@ -50,15 +50,18 @@ namespace POM_Basic.Tests
             Assert.IsTrue(loginpage.LoginHeader());                    //Verify that the User lands on the Login Page
         }
 
-         [Test]
+        [Test]
         public async Task Login_With_Api()
         {
             //Test Execution Flow steps
             homepage.LaunchUrl();
 
-            await homepage.Click_On_Login_Button(); 
-            await loginTestApi.AuthenticateTest();
-            await loginTestApi.AddToCart();
+            await homepage.Click_On_Login_Button();
+            await loginTestApi.AuthenticateTest(json.ReadData("postApiEndPoint"), 
+                    JsonUtility.ReadAndDeserialize("username", "password"));
+
+            await loginTestApi.GetShoppingCart(json.ReadData("shoppingCartApiEndPoint"));
+            await loginTestApi.AddToCart(json.ReadData("addToCartApiEndPoint"));
         }
 
     }

@@ -13,10 +13,17 @@ namespace POM_Basic.Utilities
         {
 
         }
-        public string ReadData(String value)
+          public string ReadData(String value)
         {
             string filePath = System.IO.Directory.GetParent(@"../../../") + "/config.json";
-            dynamic jsonFile = JsonConvert.DeserializeObject(File.ReadAllText(filePath));
+            dynamic jsonFile = JsonConvert.DeserializeObject(File.ReadAllText(filePath))!;
+            return jsonFile[value];
+        }
+
+          public string ReadQuantityJson(String value)
+        {
+            string filePath = System.IO.Directory.GetParent(@"../../../") + "/quantity.json";
+            dynamic jsonFile = JsonConvert.DeserializeObject(File.ReadAllText(filePath))!;
             return jsonFile[value];
         }
     }

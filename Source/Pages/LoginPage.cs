@@ -1,4 +1,5 @@
-﻿using OpenQA.Selenium;
+﻿using Microsoft.Playwright;
+using OpenQA.Selenium;
 using POM_Basic.Source.Drivers;
 using POM_Basic.Utilities;
 using SeleniumExtras.PageObjects;
@@ -12,6 +13,7 @@ namespace POM_Basic.Source.Pages
         public LoginPage()
         {
             PageFactory.InitElements(_driver, this);
+             _requestContext = CreateApiContext();
         }
 
         //Declaration of Locators
@@ -45,5 +47,25 @@ namespace POM_Basic.Source.Pages
             Console.WriteLine("The " + _alertMessage.ToString);
             return _alertMessage.Displayed;
         }
+
+    private readonly Task<IAPIRequestContext?>? _requestContext;
+
+    public IAPIRequestContext? ApiRequestContext => _requestContext?.GetAwaiter().GetResult();
+
+    public void Dispose()
+    {
+        _requestContext?.Dispose();
+    }
+
+    public async Task<IAPIRequestContext?> CreateApiContext()
+    {
+        var playwright = await Playwright.CreateAsync();
+
+        return await playwright.APIRequest.NewContextAsync(new APIRequestNewContextOptions
+        {
+            BaseURL = json.ReadData("url"),
+            IgnoreHTTPSErrors = true
+        });
+    }
     }
 }
