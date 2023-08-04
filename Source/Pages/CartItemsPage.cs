@@ -1,10 +1,10 @@
-
 using OpenQA.Selenium;
 using POM_Basic.Source.Drivers;
 using SeleniumExtras.PageObjects;
 
 namespace POM_Basic.Source.Pages
 {
+    
      public class CartItemsPage : Driver
      {
         public CartItemsPage()

@@ -1,17 +1,5 @@
-﻿using AventStack.ExtentReports;
-using AventStack.ExtentReports.Reporter;
-using NUnit.Framework;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
-using POM_Basic.Source.Drivers;
+﻿using POM_Basic.Source.Drivers;
 using POM_Basic.Source.Pages;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WebDriverManager;
-using WebDriverManager.DriverConfigs.Impl;
 namespace POM_Basic.Tests
 {
     [TestFixture]

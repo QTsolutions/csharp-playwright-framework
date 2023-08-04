@@ -4,7 +4,6 @@ using POM_Basic.Source.Drivers;
 using POM_Basic.Utilities;
 using SeleniumExtras.PageObjects;
 
-
 namespace POM_Basic.Source.Pages
 {
     public class HomePage : Driver
